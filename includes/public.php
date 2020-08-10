@@ -23,6 +23,8 @@ add_filter('login_url', 'jr_ps_login_url');
 add_action('wp_login_failed', 'jr_ps_login_failed');
 add_action('wp_authenticate', 'jr_ps_wp_authenticate', 10, 2);
 
+add_filter('my_private_site_access_control_filter', 'my_private_site_exclude_from_private');
+
 $settings = get_option('jr_ps_settings');
 if ($settings['wplogin_php']) {
     /*	Run this Filter "last" (Priority=100) to be sure that Paid Memberships Pro
@@ -64,6 +66,33 @@ if ($settings['wplogin_php']) {
 function jr_ps_login() {
     global $jr_ps_is_login;
     $jr_ps_is_login = true;
+}
+
+function my_private_site_exclude_from_private($current_url) {
+    // code that does actual test for access for restricted pages
+    // in Jon's original code, excl_url was an array of URLs that were "excluded" from being private
+
+    // DEBUG TEST IN THIS VERSION - SET NOT (!) BELOW TO SEE IF PRIVATE PAGES IDEA WORKS
+    $settings = get_option('jr_ps_settings');
+    if (isset($settings['excl_url'])) {
+        foreach ($settings['excl_url'] as $arr) {
+            /*	Test the pre-parsed URL in the URL Exclusion list
+            */
+            if (jr_v1_same_url($arr[1], $current_url)) {
+                return true; // show the page
+            }
+        }
+    }
+    if (isset($settings['excl_url_prefix'])) {
+        foreach ($settings['excl_url_prefix'] as $arr) {
+            /*	Test the pre-parsed URL in the Prefix URL Exclusion list
+            */
+            if (jr_v1_same_prefix_url($arr[1], $current_url)) {
+                return true; // show the page
+            }
+        }
+    }
+    return false;
 }
 
 /**
@@ -118,25 +147,13 @@ function jr_ps_force_login() {
     if ($settings['custom_login'] && !empty($settings['login_url']) && jr_v1_same_url($settings['login_url'], $current_url)) {
         return;
     }
-    if (isset($settings['excl_url'])) {
-        foreach ($settings['excl_url'] as $arr) {
-            /*	Test the pre-parsed URL in the URL Exclusion list
-            */
-            if (jr_v1_same_url($arr[1], $current_url)) {
-                return;
-            }
-        }
-    }
-    if (isset($settings['excl_url_prefix'])) {
-        foreach ($settings['excl_url_prefix'] as $arr) {
-            /*	Test the pre-parsed URL in the Prefix URL Exclusion list
-            */
-            if (jr_v1_same_prefix_url($arr[1], $current_url)) {
-                return;
-            }
-        }
-    }
 
+    // Extensible access control capability
+    // if returned value is true, then access to page is granted
+    $access_granted = apply_filters('my_private_site_access_control_filter', $current_url);
+    if ($access_granted) return;
+
+    // registration tests
     if ($settings['reveal_registration']) {
         $buddypress_path   = 'buddypress/bp-loader.php';
         $buddypress_active = is_plugin_active($buddypress_path);
