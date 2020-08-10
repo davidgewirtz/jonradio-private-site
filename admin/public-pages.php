@@ -81,7 +81,7 @@ function my_private_site_admin_public_pages_make_public_section_data($section_op
     ));
     my_private_site_preload_cmb2_field_filter('my_private_site_admin_public_pages_site_home', $handler_function);
 
-    $section_desc = '<i>Specify pages to remain accessible to the public without needing a login.</i><br>';
+    $section_desc = '<i>Specify pages to accessible to the public on a private site without needing a login.</i><br>';
 
     // promo
     $feature_desc = 'Public Pages lets you designate specific pages, or all pages with specified ';
@@ -92,6 +92,23 @@ function my_private_site_admin_public_pages_make_public_section_data($section_op
     $section_options->add_field(array(
         'name'        => 'Specify Public Pages',
         'id'          => 'my_private_site_admin_advanced_public_pages_title',
+        'type'        => 'title',
+        'after_field' => $section_desc,
+    ));
+
+    $section_desc = '<i>Specify pages to be blocked on a publicly-accessible site unless logged in.</i><br>';
+
+    // promo
+    $feature_desc = 'Private Pages lets you designate specific pages, or all pages with specified ';
+    $feature_desc .= 'prefixes, to be blocked from the public without login. ';
+    $feature_url  = 'https://zatzlabs.com/project/my-private-site-plugins-and-extensions/';
+    $section_desc .= my_private_site_get_feature_promo($feature_desc, $feature_url, 'UPGRADE', ' ');
+    $section_desc .= '<BR>Note: You may upgrade to either Public Pages or Private Pages for a given site. ';
+    $section_desc .= 'My Private Site will not allow both to be activated together.';
+
+    $section_options->add_field(array(
+        'name'        => 'Specify Private Pages',
+        'id'          => 'my_private_site_admin_advanced_private_pages_title',
         'type'        => 'title',
         'after_field' => $section_desc,
     ));
