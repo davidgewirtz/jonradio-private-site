@@ -360,6 +360,9 @@ function my_private_site_process_add_settings_fields_with_options5(
 }
 
 function my_private_site_is_referred_by_page($page) {
+    if(!isset($_SERVER["HTTP_REFERER"])) {
+        return false;
+    }
     // takes the value of $args['option_key']) from calling function as parameter
     // this is the name of the admin page we're checking
     // good for seeing if self-referring, if user was redirected from the current page
