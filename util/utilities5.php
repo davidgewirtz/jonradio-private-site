@@ -102,6 +102,7 @@ function my_private_site_display_cmb2_submit_button($section_options, $button_op
         'id'             => $button_options['button_id'],
         'button_options' => $button_options,
         'render_row_cb'  => 'my_private_site_display_cmb2_submit_button_callback',
+        'type'           => 'button',
     ));
 }
 
